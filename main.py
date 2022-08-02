@@ -1,6 +1,7 @@
 from attackcti import attack_client
 from stix2 import TAXIICollectionSource
 from taxii2client.v20 import Collection
+import urllib.parse
 import logging
 
 def intro():
@@ -80,7 +81,7 @@ def identify_groups(lift, techniques_from_incident, software_from_incident):
 
 def print_results(name,id,url):
     print("...\n")
-    print("Possible Group Found: " + name + " " + id + " " + url + " "+ "https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F"+id+"%2F"+id+"-enterprise-layer.json" +" \n")
+    print("Possible Group Found: " + name + " " + id + " " + url + " "+ "https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F"+id+"%2F"+id+"-enterprise-layer.json" + " " +"https://demo.opencti.io/dashboard/search/"+urllib.parse.quote(name) +" " +" \n")
     print("...\n")
 
 intro()
