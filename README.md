@@ -5,7 +5,9 @@
 
 WhatHitMe is a Python3 tool which provides the possible Groups that may have attacked you in an incident, based on specific Techniques and Software you have identified (MITRE ATT&CK). It also provides searches to known sources for these Groups to get a better insight of what you might had been facing! These sources are:
 • OpenCTI
+
 • Alienvault OTX
+
 • Mandiant
 • IBM X-FORCE
 • ETDA
