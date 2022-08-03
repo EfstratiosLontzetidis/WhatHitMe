@@ -183,7 +183,8 @@ def save_results(name,id,url):
                     ['Broadcom', 'https://www.broadcom.com/site-search?q=' + urllib.parse.quote(name)],
                     ['TrendMicro', 'https://www.trendmicro.com/en_us/common/cse.html#?cludoquery=' + urllib.parse.quote(
                         name) + '&cludopage=1&cludorefurl=https%3A%2F%2Fwww.trendmicro.com%2Fen_us%2Fbusiness.html&cludorefpt=%231%20in%20Cloud%20Security%20%26%20Endpoint%20Cybersecurity%20%7C%20Trend%20Micro&cludoinputtype=standard' + urllib.parse.quote(
-                        name)]],
+                        name)],
+                      ['Hacker News', 'https://hn.algolia.com/?q='+urllib.parse.quote(name)]],
                    headers=['Source', 'Url']))
     f.write("...\n")
 
