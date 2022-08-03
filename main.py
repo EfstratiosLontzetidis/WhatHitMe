@@ -1,6 +1,8 @@
 from attackcti import attack_client
 from stix2 import TAXIICollectionSource
 from taxii2client.v20 import Collection
+from tabulate import tabulate
+from datetime import date
 import urllib.parse
 import logging
 
@@ -80,14 +82,14 @@ def get_attack_software(client):
 def identify_groups(lift, techniques_from_incident, software_from_incident):
     # initialize match flag to catch matched groups
     match=False
+    # initialize lists to store the techniques and software used by each group
+    techniques_from_group = []
+    tools_from_group = []
     # get all the groups from the att&ck client
     groups = lift.get_groups()
     counter=0
     # loop for every group
     for group in groups:
-        # initialize lists to store the techniques and software used by each group
-        techniques_from_group = []
-        tools_from_group = []
         # get the techniques used for each group through the att&ck client
         group_techniques = lift.get_techniques_used_by_group(groups[counter])
         # store group name, id and att&ck url for printing in variables
@@ -120,14 +122,68 @@ def identify_groups(lift, techniques_from_incident, software_from_incident):
         if match==True:
             # print the results. Also give this function the group name,id,url
             print_results(group_name,group_id,group_url)
-        # at the end of the loop, re-initialize the flag, and increase the loop counter
+        # at the end of the loop, re-initialize the flag, empty lists and increase the loop counter
+        techniques_from_group.clear()
+        tools_from_group.clear()
         match=False
         counter = counter + 1
 
 # results printing
 def print_results(name,id,url):
-    print("Possible Group Found: " + name + " " + id + " " + url + " "+ "https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F"+id+"%2F"+id+"-enterprise-layer.json" + " " +"https://demo.opencti.io/dashboard/search/"+urllib.parse.quote(name) +" " +" \n")
+    # print group infromation about ATT&CK
+    print("*****Possible Group Found*****")
+    print(tabulate([[name, id, url, 'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F'+id+'%2F'+id+'-enterprise-layer.json']],
+                   headers=['Name', 'ID', 'ATT&CK URL', 'ATT&CK Navigator URL']))
+    print("\n")
+    # print searched related with this group
+    print("Searches regarding this group:")
+    print(tabulate([['OpenCTI (req. login)', 'https://demo.opencti.io/dashboard/search/'+urllib.parse.quote(name)],
+                    ['Alienvault OTX (req. login)', 'https://otx.alienvault.com/browse/global/pulses?q='+urllib.parse.quote(name)+'&include_inactive=0&sort=-modified&page=1&limit=10&indicatorsSearch='+urllib.parse.quote(name)],
+                    ['Mandiant', 'https://www.mandiant.com/search?search='+urllib.parse.quote(name)],
+                    ['IBM X-FORCE (req. login)', 'https://exchange.xforce.ibmcloud.com/search/'+urllib.parse.quote(name)],
+                    ['ETDA', 'https://apt.etda.or.th/cgi-bin/listgroups.cgi?c=&v=&s=&m=&x='+urllib.parse.quote(name)],
+                    ['Rapid7', 'https://docs.rapid7.com/search/?q='+urllib.parse.quote(name)+'&filters=productname_InsightIDR&page=0'],
+                    ['Check Point', 'https://threatpoint.checkpoint.com/ThreatPortal/search?pattern='+urllib.parse.quote(name)+'&type=all&page=0'],
+                    ['Broadcom', 'https://www.broadcom.com/site-search?q='+urllib.parse.quote(name)],
+                    ['TrendMicro', 'https://www.trendmicro.com/en_us/common/cse.html#?cludoquery='+urllib.parse.quote(name)+'&cludopage=1&cludorefurl=https%3A%2F%2Fwww.trendmicro.com%2Fen_us%2Fbusiness.html&cludorefpt=%231%20in%20Cloud%20Security%20%26%20Endpoint%20Cybersecurity%20%7C%20Trend%20Micro&cludoinputtype=standard'+urllib.parse.quote(name)]],
+                   headers=['Source', 'Url']))
     print("...\n")
+    # also save results
+    save_results(name,id,url)
+
+# save results to a file
+def save_results(name,id,url):
+    f=open("WhatHitMe-"+str(date.today())+".txt", "a")
+    f.write("*****Possible Group Found*****")
+    f.write("\n")
+    f.write("\n")
+    f.write(tabulate([[name, id, url,
+                     'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F' + id + '%2F' + id + '-enterprise-layer.json']],
+                   headers=['Name', 'ID', 'ATT&CK URL', 'ATT&CK Navigator URL']))
+    f.write("\n")
+    f.write("\n")
+    # print searched related with this group
+    f.write("Searches regarding this group:")
+    f.write(tabulate([['OpenCTI (req. login)', 'https://demo.opencti.io/dashboard/search/' + urllib.parse.quote(name)],
+                    ['Alienvault OTX (req. login)',
+                     'https://otx.alienvault.com/browse/global/pulses?q=' + urllib.parse.quote(
+                         name) + '&include_inactive=0&sort=-modified&page=1&limit=10&indicatorsSearch=' + urllib.parse.quote(
+                         name)],
+                    ['Mandiant', 'https://www.mandiant.com/search?search=' + urllib.parse.quote(name)],
+                    ['IBM X-FORCE (req. login)',
+                     'https://exchange.xforce.ibmcloud.com/search/' + urllib.parse.quote(name)],
+                    ['ETDA', 'https://apt.etda.or.th/cgi-bin/listgroups.cgi?c=&v=&s=&m=&x=' + urllib.parse.quote(name)],
+                    ['Rapid7', 'https://docs.rapid7.com/search/?q=' + urllib.parse.quote(
+                        name) + '&filters=productname_InsightIDR&page=0'],
+                    ['Check Point',
+                     'https://threatpoint.checkpoint.com/ThreatPortal/search?pattern=' + urllib.parse.quote(
+                         name) + '&type=all&page=0'],
+                    ['Broadcom', 'https://www.broadcom.com/site-search?q=' + urllib.parse.quote(name)],
+                    ['TrendMicro', 'https://www.trendmicro.com/en_us/common/cse.html#?cludoquery=' + urllib.parse.quote(
+                        name) + '&cludopage=1&cludorefurl=https%3A%2F%2Fwww.trendmicro.com%2Fen_us%2Fbusiness.html&cludorefpt=%231%20in%20Cloud%20Security%20%26%20Endpoint%20Cybersecurity%20%7C%20Trend%20Micro&cludoinputtype=standard' + urllib.parse.quote(
+                        name)]],
+                   headers=['Source', 'Url']))
+    f.write("...\n")
 
 # information display
 intro()
@@ -173,10 +229,11 @@ else:
     input_sofware=get_incident_software(attack_software)
 print("\n")
 print("Searching for possible Groups that attacked you...")
+print("\n")
 # start searching for possible gorups that performed the attack based on the input provided
 try:
     identify_groups(lift, input_techniques, input_sofware)
 except KeyboardInterrupt:
     print("Closing WhatHitMe..")
-    print("Output saved in ...")
+    print("Output saved in this folder.")
 
