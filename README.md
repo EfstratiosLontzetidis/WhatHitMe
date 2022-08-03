@@ -4,18 +4,27 @@
 # WhatHitMe
 
 WhatHitMe is a Python3 tool which provides the possible Groups that may have attacked you in an incident, based on specific Techniques and Software you have identified (MITRE ATT&CK). It also provides searches to known sources for these Groups to get a better insight of what you might had been facing! These sources are:
+
 • OpenCTI
 
 • Alienvault OTX
 
 • Mandiant
+
 • IBM X-FORCE
+
 • ETDA
+
 • Rapid7
+
 • Check Point
+
 • Broadcom
+
 • TrendMicro
+
 • HackerNews
+
 • More coming soon!
 
 It runs in Linux/Unix systems but it can run on Windows as well.
@@ -54,7 +63,9 @@ Konstantinos Pantazis   (https://github.com/kostas-pa)
 # New Features Coming Soon
 
 • CTI feeds search based on the identified Groups!
+
 • CTI feed production for a specific group that you and WhatHitMe have identified, so the community can stay updated with latest Group activity!
+
 • Do you have any other feature to suggest? Use the issues tab!
 
 # Sidenote
