@@ -145,7 +145,8 @@ def print_results(name,id,url):
                     ['Rapid7', 'https://docs.rapid7.com/search/?q='+urllib.parse.quote(name)+'&filters=productname_InsightIDR&page=0'],
                     ['Check Point', 'https://threatpoint.checkpoint.com/ThreatPortal/search?pattern='+urllib.parse.quote(name)+'&type=all&page=0'],
                     ['Broadcom', 'https://www.broadcom.com/site-search?q='+urllib.parse.quote(name)],
-                    ['TrendMicro', 'https://www.trendmicro.com/en_us/common/cse.html#?cludoquery='+urllib.parse.quote(name)+'&cludopage=1&cludorefurl=https%3A%2F%2Fwww.trendmicro.com%2Fen_us%2Fbusiness.html&cludorefpt=%231%20in%20Cloud%20Security%20%26%20Endpoint%20Cybersecurity%20%7C%20Trend%20Micro&cludoinputtype=standard'+urllib.parse.quote(name)]],
+                    ['TrendMicro', 'https://www.trendmicro.com/en_us/common/cse.html#?cludoquery='+urllib.parse.quote(name)+'&cludopage=1&cludorefurl=https%3A%2F%2Fwww.trendmicro.com%2Fen_us%2Fbusiness.html&cludorefpt=%231%20in%20Cloud%20Security%20%26%20Endpoint%20Cybersecurity%20%7C%20Trend%20Micro&cludoinputtype=standard'+urllib.parse.quote(name)],
+                    ['Hacker News', 'https://hn.algolia.com/?q='+urllib.parse.quote(name)]],
                    headers=['Source', 'Url']))
     print("...\n")
     # also save results
@@ -154,6 +155,7 @@ def print_results(name,id,url):
 # save results to a file
 def save_results(name,id,url):
     f=open("WhatHitMe-"+str(date.today())+".txt", "a")
+    f.write("\n")
     f.write("*****Possible Group Found*****")
     f.write("\n")
     f.write("\n")
