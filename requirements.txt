@@ -1,0 +1,8 @@
+attackcti==0.3.7
+colorama==0.4.5
+GitPython==3.1.27
+pyfiglet==0.8.post0
+stix2==3.0.1
+tabulate==0.8.9
+taxii2_client==2.3.0
+termcolor==1.1.0
