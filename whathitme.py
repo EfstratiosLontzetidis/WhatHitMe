@@ -7,7 +7,6 @@ from pyfiglet import Figlet
 import magic
 import sys
 import os
-import urlib3
 
 
 def main():
@@ -28,9 +27,6 @@ def main():
 
 	except KeyboardInterrupt:
 		print('\nExiting...\n')
-		os._exit(0)
-	except urllib3.exceptions.SSLError:
-		print('\nToo much traffic generated, please try again in a minute or two\n')
 		os._exit(0)
 
 
