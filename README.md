@@ -51,11 +51,11 @@ It runs in Linux/Unix systems but it can run on Windows as well.
 
 # Examples: 
             
-```python3 whathitme.py -t T1059 T1048.003 T1133 -o groups.txt``` -> give to the program specific techniques to search groups for, and save the results to a file
+```python3 whathitme.py -t T1595.002 T1588.001 T1574.001 -o groups.txt``` -> give to the program specific techniques to search groups for, and save the results to a file
 
-```python3 whathitme.py -t T1059 T1048.003 T1133 -s S0154 S0024 -o groups.txt``` -> include software also
+```python3 whathitme.py -t T1588.001 T1574.001 -s S0385 S0154 -o groups.txt``` -> include software also
 
-```python3 whathitme.py -t T1059 T1048.003 T1133 -s S0154 S0024 -ss``` -> include searches for the groups identified also.
+```python3 whathitme.py -t T1588.001 T1574.001 -s S0385 S0154 -ss``` -> include searches for the groups identified also.
 
 ```python3 whathitme.py -ft techniques.txt -fs software.txt``` -> give to the program specific techniques and software from a file to search groups for
 
