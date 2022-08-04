@@ -61,40 +61,7 @@ It runs in Linux/Unix systems but it can run on Windows as well.
 
 # Sample Results (with searches)
 
-*****Possible Group Found*****
-
-Name     ID     ATT&CK URL                             ATT&CK Navigator URL
--------  -----  -------------------------------------  ----------------------------------------------------------------------------------------------------------------------------------------
-Chimera  G0114  https://attack.mitre.org/groups/G0114  https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2FG0114%2FG0114-enterprise-layer.json
-
-Searches regarding this group:Source                       Url
----------------------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-OpenCTI (req. login)         https://demo.opencti.io/dashboard/search/Chimera
-Alienvault OTX (req. login)  https://otx.alienvault.com/browse/global/pulses?q=Chimera&include_inactive=0&sort=-modified&page=1&limit=10&indicatorsSearch=Chimera
-Mandiant                     https://www.mandiant.com/search?search=Chimera
-IBM X-FORCE (req. login)     https://exchange.xforce.ibmcloud.com/search/Chimera
-ETDA                         https://apt.etda.or.th/cgi-bin/listgroups.cgi?c=&v=&s=&m=&x=Chimera
-Rapid7                       https://docs.rapid7.com/search/?q=Chimera&filters=productname_InsightIDR&page=0
-Check Point                  https://threatpoint.checkpoint.com/ThreatPortal/search?pattern=Chimera&type=all&page=0
-Broadcom                     https://www.broadcom.com/site-search?q=Chimera
-TrendMicro                   https://www.trendmicro.com/en_us/common/cse.html#?cludoquery=Chimera&cludopage=1&cludorefurl=https%3A%2F%2Fwww.trendmicro.com%2Fen_us%2Fbusiness.html&cludorefpt=%231%20in%20Cloud%20Security%20%26%20Endpoint%20Cybersecurity%20%7C%20Trend%20Micro&cludoinputtype=standardChimera...
-*****Possible Group Found*****
-
-Name           ID     ATT&CK URL                             ATT&CK Navigator URL
--------------  -----  -------------------------------------  ----------------------------------------------------------------------------------------------------------------------------------------
-Wizard Spider  G0102  https://attack.mitre.org/groups/G0102  https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2FG0102%2FG0102-enterprise-layer.json
-
-Searches regarding this group:Source                       Url
----------------------------  ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-OpenCTI (req. login)         https://demo.opencti.io/dashboard/search/Wizard%20Spider
-Alienvault OTX (req. login)  https://otx.alienvault.com/browse/global/pulses?q=Wizard%20Spider&include_inactive=0&sort=-modified&page=1&limit=10&indicatorsSearch=Wizard%20Spider
-Mandiant                     https://www.mandiant.com/search?search=Wizard%20Spider
-IBM X-FORCE (req. login)     https://exchange.xforce.ibmcloud.com/search/Wizard%20Spider
-ETDA                         https://apt.etda.or.th/cgi-bin/listgroups.cgi?c=&v=&s=&m=&x=Wizard%20Spider
-Rapid7                       https://docs.rapid7.com/search/?q=Wizard%20Spider&filters=productname_InsightIDR&page=0
-Check Point                  https://threatpoint.checkpoint.com/ThreatPortal/search?pattern=Wizard%20Spider&type=all&page=0
-Broadcom                     https://www.broadcom.com/site-search?q=Wizard%20Spider
-TrendMicro                   https://www.trendmicro.com/en_us/common/cse.html#?cludoquery=Wizard%20Spider&cludopage=1&cludorefurl=https%3A%2F%2Fwww.trendmicro.com%2Fen_us%2Fbusiness.html&cludorefpt=%231%20in%20Cloud%20Security%20%26%20Endpoint%20Cybersecurity%20%7C%20Trend%20Micro&cludoinputtype=standardWizard%20Spider...
+![image](https://user-images.githubusercontent.com/50456183/182895230-939d8acc-cedc-4144-b7ce-d0f138a2d65a.png)
 
 # Developers: 
 
