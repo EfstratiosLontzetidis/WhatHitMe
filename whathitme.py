@@ -7,6 +7,7 @@ from pyfiglet import Figlet
 import magic
 import sys
 import os
+import urlib3
 
 
 def main():
