@@ -80,6 +80,7 @@ def get_attack_software(client):
     return enterprise_sofware
 
 def identify_groups(lift, techniques_from_incident, software_from_incident):
+    count=0
     # initialize match flag to catch matched groups
     match=False
     # initialize lists to store the techniques and software used by each group
@@ -117,6 +118,7 @@ def identify_groups(lift, techniques_from_incident, software_from_incident):
             # check if the software that were placed as input from an incident are a sublist from the software used by this group
             if(all(x in tools_from_group for x in software_from_incident)):
                 # if yes, tha flag changes to True
+                count=count+1
                 match=True
         # if this group is a possible group that attacked in this incident
         if match==True:
@@ -127,6 +129,7 @@ def identify_groups(lift, techniques_from_incident, software_from_incident):
         tools_from_group.clear()
         match=False
         counter = counter + 1
+    return count
 
 # results printing
 def print_results(name,id,url):
@@ -235,7 +238,9 @@ print("Searching for possible Groups that attacked you...")
 print("\n")
 # start searching for possible gorups that performed the attack based on the input provided
 try:
-    identify_groups(lift, input_techniques, input_sofware)
+    count=identify_groups(lift, input_techniques, input_sofware)
+    if count==0:
+        print("\nSorry, no groups found with that criteria!\n")
 except KeyboardInterrupt:
     print("Closing WhatHitMe..")
     print("Output saved in this folder.")
