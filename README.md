@@ -45,7 +45,7 @@ It runs in Linux/Unix systems but it can run on Windows as well.
 
 • It is recommended to run the **--update** flag before initiating the tool.
 
-• Techniques are mandatory to be supplied to the tool, seperated by spaces (or lines if it is a file). The software flags are optiona;.
+• Techniques are mandatory to be supplied to the tool, seperated by spaces (or lines if it is a file). The software flags are optional.
 
 ![image](https://user-images.githubusercontent.com/50456183/182891989-07a6060d-0df9-434c-a7d1-9e2dc85c2409.png)
 
