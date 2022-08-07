@@ -39,9 +39,11 @@ It runs in Linux/Unix systems but it can run on Windows as well.
 
 • Go to the WhatHitMe folder ```cd WhatHitMe```
 
-• First run the command ```pip install -r requirements.txt```
+• First run the command ```sudo chmod +x setup.sh``` for linux
 
-• After that you can simply run whathitme to show the help guide with the command ```python3 whathitme.py -h```.
+• Then run the command ```sudo ./setup.sh``` for linux, this will automatically install all the reqiured packages and will add the whathitme.py file to the /bin path so that you can run it as a command from anywhere in the system
+
+• After that you can simply run whathitme as a command to show the help guide with the command ```whathitme -h``` or simply ```whathitme```.
 
 • It is recommended to run the **--update** flag before initiating the tool.
 
