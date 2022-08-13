@@ -5,6 +5,7 @@ from termcolor import colored
 from tabulate import tabulate
 import urllib.parse
 import logging
+import gui
 
 
 # this is where all the magic happens
@@ -13,11 +14,12 @@ class Magic:
     # T1595.002, T1588.001, T1574.001
     # S0385, S0154
 
-    def __init__(self, technique, software, outfile, searches=False, initiate=True):
+    def __init__(self, technique, software, outfile, ui=False, searches=False, initiate=True):
         self.technique = technique
         self.software = software
         self.outfile = outfile
         self.searches = searches
+        self.ui = ui
 
         # variables and collections initialize for taxii2client in order to use att&ck information
         logging.getLogger('taxii2client').setLevel(logging.CRITICAL)
@@ -36,34 +38,35 @@ class Magic:
         TC_ICS_SOURCE = TAXIICollectionSource(ICS_COLLECTION)
 
         if initiate:
-            self.intro()
-            self.analyze()
+            if self.ui:
+                gui.Gui()
+            else:
+                self.intro()
+                self.analyze()
             
-            
-
 
     def analyze(self):
-     # initialize att&ck client from taxii2
-     lift = attack_client()
-     # get all the techniques from att&ck
-     attack_techniques = self.get_attack_techniques(lift)
-     # get all the software from att&ck
-     attack_software = self.get_attack_software(lift)
-     # get an incident's techniques. Contains also validation on if the technique exists in att&ck
-     input_techniques = self.get_incident_techniques(attack_techniques)
-     if self.software is None:
-         input_sofware = []
-         pass
-     else:
-        # get an incident's software. Contains also validation on if the software exists in att&ck
-        input_sofware = self.get_incident_software(attack_software)
-        print("\n")
-        print(colored("[!]", 'yellow') + " Searching for possible Groups that attacked you...")
-        print("\n")
-        # start searching for possible groups that performed the attack based on the input provided
-        found = self.identify_groups(lift, input_techniques, input_sofware)
-        if found == 0:
-            print(colored("[-]", 'red') + " No groups found with that criteria")
+        # initialize att&ck client from taxii2
+        lift = attack_client()
+        # get all the techniques from att&ck
+        attack_techniques = self.get_attack_techniques(lift)
+        # get all the software from att&ck
+        attack_software = self.get_attack_software(lift)
+        # get an incident's techniques. Contains also validation on if the technique exists in att&ck
+        input_techniques = self.get_incident_techniques(attack_techniques)
+        if self.software is None:
+            input_sofware = []
+            pass
+        else:
+            # get an incident's software. Contains also validation on if the software exists in att&ck
+            input_sofware = self.get_incident_software(attack_software)
+            print("\n")
+            print(colored("[!]", 'yellow') + " Searching for possible Groups that attacked you...")
+            print("\n")
+            # start searching for possible groups that performed the attack based on the input provided
+            found = self.identify_groups(lift, input_techniques, input_sofware)
+            if found == 0:
+                print(colored("[-]", 'red') + " No groups found with that criteria")
 
 
     # information about the tool

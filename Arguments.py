@@ -2,7 +2,6 @@ from argparse import RawDescriptionHelpFormatter
 from termcolor import colored
 from sys import platform
 import argparse
-import pathlib
 import git
 import os
 
@@ -47,6 +46,7 @@ class Arguments:
 
         self.searches = args.searches
         self.outfile = args.outfile
+        self.ui = args.gui
 
 
     def update(self):
@@ -71,11 +71,12 @@ class Arguments:
     def ConfigureParser(self):
         parser = argparse.ArgumentParser(prog='whathitme.py', description="""""", epilog= '''Developers: Efstratios Lontzetidis (https://github.com/EfstratiosLontzetidis)
             Konstantinos Pantazis (https://github.com/kostas-pa)''', formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument('-t', '--technique', nargs='*', dest="input_technique", metavar='Technique', help='Input the technique. If there are multiple include them like so "-t T1XXX,T1XXX"')
-        parser.add_argument('-s', '--software', nargs='*', dest="input_software", metavar='Software', help='Input the software. If there are multiple include them like so "-s S0XXX,S0XXX"')
+        parser.add_argument('-t', '--technique', nargs='*', dest="input_technique", metavar='Technique', help='Input the technique. If there are multiple include them like so "-t T1XXX T1XXX"')
+        parser.add_argument('-s', '--software', nargs='*', dest="input_software", metavar='Software', help='Input the software. If there are multiple include them like so "-s S0XXX S0XXX"')
         parser.add_argument('-ft', '--filetech', dest="file_technique", metavar='File techniques', help='Input a file containing the techniques. Supported file formats: txt', type=argparse.FileType('r'))
         parser.add_argument('-fs', '--filesoft', dest="file_software", metavar='File software', help='Input a file containing the software. Supported file formats: txt', type=argparse.FileType('r'))
         parser.add_argument('-ss', '--searches', dest='searches', help="Reveals more info and links about the potential APTs", action='store_true')
         parser.add_argument('-o', '--output', nargs='?', dest="outfile", help='The file to save the results')
         parser.add_argument('--update', dest='update', help="Check for updates", action='store_true')
+        parser.add_argument('--gui', dest='gui', help="Enables the GUI version of the tool", action='store_true')
         return parser
