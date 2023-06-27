@@ -3,7 +3,7 @@
 
 # WhatHitMe
 
-WhatHitMe is a Python3 tool which provides the possible Groups that may have attacked you in an incident, based on specific Techniques and Software you have identified (MITRE ATT&CK). It also provides searches to known sources for these Groups to get a better insight of what you might had been facing! These sources are:
+WhatHitMe is a Python3 tool which provides the possible Groups and their attributed Campaigns that may have attacked you in an incident, based on specific Techniques and Software you have identified (MITRE ATT&CK). It supports both enterprise, mobile and ICS matrixes. It also provides searches to known sources for these Groups to get a better insight of what you might had been facing! These sources are:
 
 • OpenCTI
 
@@ -61,6 +61,8 @@ It runs in Linux/Unix systems but it can run on Windows as well.
 
 ```python3 whathitme.py -ft techniques.txt -fs software.txt``` -> give to the program specific techniques and software from a file to search groups for
 
+```python3 whathitme.py -ft techniques.txt -fs software.txt -m 1``` -> give to the program specific techniques and software from a file to search groups for the mobile matrix
+
 # Sample Results (with searches)
 
 ![image](https://user-images.githubusercontent.com/50456183/182895230-939d8acc-cedc-4144-b7ce-d0f138a2d65a.png)
@@ -73,15 +75,7 @@ Konstantinos Pantazis   (https://github.com/kostas-pa)
 
 # ⚠️ Common Issues
 
-• WhatHitMe pulls data from ATT&CK's TAXII server which makes it slow. Give it some time! Have a read from the searches related to the already identified groups while WhatHitME is searching Groups for you!
-
-# New Features Coming Soon
-
-• CTI feeds search based on the identified Groups!
-
-• CTI feed production for a specific group that you and WhatHitMe have identified, so the community can stay updated with latest Group activity!
-
-• Do you have any other feature to suggest? Use the issues tab!
+• WhatHitMe presents an attributed Group or Campaign if every input given for techniques and software is included in that Group or Campaign. Its accuracy depends on the accuracy of your technique and software capability. In later versions likelihood will be included for each result.
 
 # Sidenote
 
