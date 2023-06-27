@@ -1,10 +1,10 @@
-from stix2 import TAXIICollectionSource
-from taxii2client.v20 import Collection
-from attackcti import attack_client
+import os
+
+import requests
 from termcolor import colored
 from tabulate import tabulate
 import urllib.parse
-import logging
+import pandas as pd
 
 
 # this is where all the magic happens
@@ -13,183 +13,275 @@ class Magic:
     # T1595.002, T1588.001, T1574.001
     # S0385, S0154
 
-    def __init__(self, technique, software, outfile, searches=False, initiate=True):
+    def __init__(self, technique, software, outfile, matrix, version, searches=False, initiate=True):
         self.technique = technique
         self.software = software
         self.outfile = outfile
         self.searches = searches
+        self.matrix=matrix[0]
+        self.version = version
 
-        # variables and collections initialize for taxii2client in order to use att&ck information
-        logging.getLogger('taxii2client').setLevel(logging.CRITICAL)
-        ATTACK_STIX_COLLECTIONS = "https://cti-taxii.mitre.org/stix/collections/"
-        ENTERPRISE_ATTACK = "95ecc380-afe9-11e4-9b6c-751b66dd541e"
-        PRE_ATTACK = "062767bd-02d2-4b72-84ba-56caef0f8658"
-        MOBILE_ATTACK = "2f669986-b40b-4423-b720-4396ca6a462b"
-        ICS_ATTACK = "02c3ef24-9cd4-48f3-a99f-b74ce24f1d34"
-        ENTERPRISE_COLLECTION = Collection(ATTACK_STIX_COLLECTIONS + ENTERPRISE_ATTACK + "/")
-        TC_ENTERPRISE_SOURCE = TAXIICollectionSource(ENTERPRISE_COLLECTION)
-        PRE_COLLECTION = Collection(ATTACK_STIX_COLLECTIONS + PRE_ATTACK + "/")
-        TC_PRE_SOURCE = TAXIICollectionSource(PRE_COLLECTION)
-        MOBILE_COLLECTION = Collection(ATTACK_STIX_COLLECTIONS + MOBILE_ATTACK + "/")
-        TC_MOBILE_SOURCE = TAXIICollectionSource(MOBILE_COLLECTION)
-        ICS_COLLECTION = Collection(ATTACK_STIX_COLLECTIONS + ICS_ATTACK + "/")
-        TC_ICS_SOURCE = TAXIICollectionSource(ICS_COLLECTION)
+        if self.matrix=="0":
+            self.matrix="enterprise"
+        elif self.matrix=="1":
+            self.matrix="mobile"
+        elif self.matrix=="2":
+            self.matrix="ics"
+        else:
+            print(colored("[-]", 'red') + " Matrix argument is not correct, try again\n")
+            exit()
+
+
+        if os.path.exists("techniques.xlsx"):
+            pass
+        else:
+            print(colored("[!]", 'yellow') + " Downloading the Techniques excel file for the matrix: " + str(self.matrix)+" and version: "+ str(self.version)+"\n")
+            try:
+                response = requests.get(
+                    "https://attack.mitre.org/docs/"+str(self.matrix)+"-attack-v13.1/"+str(self.matrix)+"-attack-v"+str(self.version)+"-techniques.xlsx")
+                response.raise_for_status()
+                # Save the file
+                with open("techniques.xlsx", "wb") as file:
+                    file.write(response.content)
+            except Exception as e:
+                print(colored("[-]",
+                              'red') + " HTTP request was not successful. Please check the provided version of the matrix and check again " + "\n")
+                exit()
+
+        if os.path.exists("software.xlsx"):
+            pass
+        else:
+            print(colored("[!]", 'yellow') + " Downloading the Software excel file for the matrix: " + str(self.matrix)+" and version: "+ str(self.version)+"\n")
+            try:
+                response = requests.get(
+                    "https://attack.mitre.org/docs/"+str(self.matrix)+"-attack-v13.1/"+str(self.matrix)+"-attack-v"+str(self.version)+"-software.xlsx")
+                response.raise_for_status()
+                # Save the file
+                with open("software.xlsx", "wb") as file:
+                    file.write(response.content)
+            except Exception as e:
+                print(colored("[-]",
+                              'red') + " HTTP request was not successful. Please check the provided version of the matrix and check again " + "\n")
+                exit()
+
+        if os.path.exists("groups.xlsx"):
+            pass
+        else:
+            print(colored("[!]", 'yellow') + " Downloading the Groups excel file for the matrix: " + str(self.matrix)+" and version: "+ str(self.version)+"\n")
+            try:
+                response = requests.get(
+                    "https://attack.mitre.org/docs/"+str(self.matrix)+"-attack-v13.1/"+str(self.matrix)+"-attack-v"+str(self.version)+"-groups.xlsx")
+
+                # Save the file
+                with open("groups.xlsx", "wb") as file:
+                    file.write(response.content)
+            except Exception as e:
+                print(colored("[-]",
+                              'red') + " HTTP request was not successful. Please check the provided version of the matrix and try again " + "\n")
+                exit()
+
+        if os.path.exists("campaigns.xlsx"):
+            pass
+        else:
+            print(colored("[!]", 'yellow') + " Downloading the Campaigns excel file for the matrix: " + str(self.matrix)+" and version: "+ str(self.version)+"\n")
+            try:
+                response = requests.get(
+                    "https://attack.mitre.org/docs/"+str(self.matrix)+"-attack-v13.1/"+str(self.matrix)+"-attack-v"+str(self.version)+"-campaigns.xlsx")
+                # Save the file
+                with open("campaigns.xlsx", "wb") as file:
+                    file.write(response.content)
+            except Exception as e:
+                print(colored("[-]",
+                              'red') + " HTTP request was not successful. Please check the provided version of the matrix and try again " + "\n")
+                exit()
 
         if initiate:
-            self.intro()
             self.analyze()
-            
-            
 
 
     def analyze(self):
-     # initialize att&ck client from taxii2
-     lift = attack_client()
-     # get all the techniques from att&ck
-     attack_techniques = self.get_attack_techniques(lift)
-     # get all the software from att&ck
-     attack_software = self.get_attack_software(lift)
      # get an incident's techniques. Contains also validation on if the technique exists in att&ck
-     input_techniques = self.get_incident_techniques(attack_techniques)
+     techniques_sheet = pd.read_excel("techniques.xlsx", sheet_name="techniques")
+     attack_techniques=self.get_attack_techniques(techniques_sheet)
+     software_sheet = pd.read_excel("software.xlsx", sheet_name="software")
+     attack_software=self.get_attack_software(software_sheet)
+     input_techniques = self.get_incident_techniques(self.technique, attack_techniques)
      if self.software is None:
          input_sofware = []
          pass
      else:
         # get an incident's software. Contains also validation on if the software exists in att&ck
-        input_sofware = self.get_incident_software(attack_software)
+        input_sofware = self.get_incident_software(self.software, attack_software)
         print("\n")
-        print(colored("[!]", 'yellow') + " Searching for possible Groups that attacked you...")
+        print(colored("[!]", 'yellow') + " Searching for possible Groups and Campaigns that attacked you...")
         print("\n")
         # start searching for possible groups that performed the attack based on the input provided
-        found = self.identify_groups(lift, input_techniques, input_sofware)
-        if found == 0:
-            print(colored("[-]", 'red') + " No groups found with that criteria")
-
-
-    # information about the tool
-    def intro(self):
-     print("This is a python script that offers the visibility to a defender to know the possible"
-              " APT groups that targeted"
-              " an organization, after understanding the techniques and software used.\n\n\n")
+        self.identify_groups(input_techniques, input_sofware)
+        print(colored("[!]", 'yellow') + " End of WhatHitMe's execution")
 
 
     # receive the techniques that were identified in an incident
-    def get_incident_techniques(self, techniques):
-        # initialize list for storing the techniques from an incident
+    def get_incident_techniques(self, techniques, attack_techniques):
+        # initialize list for storing software from an incident
         incident_techniques = []
-        # check if the provided technique exists in att&ck matrix
-        for x in self.technique:
-            if x in techniques.keys():    
-                # if it exists in att&ck matrix then import it to a list
-                print(colored("[+]", 'green') + f" The technique {x} added to the list!")
-                incident_techniques.append(x)
-            else:
-                # if provided input does not exist, loop again
-                print(colored("[-]", 'red') + f" The technique {x} does not exist in ATT&CK")
-        # return list with techniques supplied from an incident
-        return incident_techniques
+        for x in techniques:
+            # check if the provided software exists in att&ck matrix
+            if x in attack_techniques:
+                incident_techniques.append(x.strip('\n'))
+                print(colored("[+]", 'green') + f" The technique {x.rstrip()} added to the list!")
+        return list(set(incident_techniques))
 
 
     # receive the software that were identified in an incident
-    def get_incident_software(self, tools):
+    def get_incident_software(self, software, attack_software):
         # initialize list for storing software from an incident
         incident_software = []
-        for x in self.software:
-            if x in tools.keys():
-                # check if the provided software exists in att&ck matrix
-                print(colored("[+]", 'green') + f" The software {x} added to the list!")
-                incident_software.append(x)
-            else:
-                # if provided input does not exist, loop again
-                print(colored("[-]", 'red') + f" The software {x} does not exist in ATT&CK")
-                # return list with software supplied from an incident
-        return incident_software
+        for x in software:
+            # check if the provided software exists in att&ck matrix
+            if x in attack_software:
+                incident_software.append(x.strip('\n'))
+                print(colored("[+]", 'green') + f" The software {x.rstrip()} added to the list!")
+        return list(set(incident_software))
 
 
     # pull all the ATT&CK techniques
-    def get_attack_techniques(self, client):
+    def get_attack_techniques(self, techniques):
         # initialize dictionary to store the techniques
-        enterprise_techniques={}
+        enterprise_techniques=[]
         # loop for all techniques and subtechniques
-        for technique in client.get_techniques():
-           # in the dictionary store in the key field the technique ID and in the value field the technique name
-           enterprise_techniques[technique['external_references'][0]['external_id']]=technique['name']
+        for index, row in techniques.iterrows():
+            technique = row[list(row.keys())[0]]
+            enterprise_techniques.append(technique)
         # return the dictionary of techniques
         return enterprise_techniques
 
 
     # pull all the ATT&CK software
-    def get_attack_software(self, client):
+    def get_attack_software(self, software):
         # dictionary initialize to store the software
-        enterprise_sofware={}
+        enterprise_sofware=[]
         # loop for all software
-        for software in client.get_software():
-            # in the dictionary store in the key field the software ID and in the value field the software name
-            enterprise_sofware[software['external_references'][0]['external_id']]=software['name']
+        for index, row in software.iterrows():
+            software = row[list(row.keys())[0]]
+            enterprise_sofware.append(software)
         # return the dictionary of software
         return enterprise_sofware
 
 
-    def identify_groups(self, lift, techniques_from_incident, software_from_incident):
-        count = 0
-        # initialize match flag to catch matched groups
-        match = False
-        # initialize lists to store the techniques and software used by each group
-        techniques_from_group = []
-        tools_from_group = []
-        # get all the groups from the att&ck client
-        groups = lift.get_groups()
-        counter = 0
-        # loop for every group
-        for group in groups:
-            # get the techniques used for each group through the att&ck client
-            group_techniques = lift.get_techniques_used_by_group(groups[counter])
-            # store group name, id and att&ck url for printing in variables
-            group_name=group['name']
-            group_id=group['external_references'][0]['external_id']
-            group_url = group['external_references'][0]['url']
-            # for every technique in the techniques used from this group
-            for technique in group_techniques:
-                # store the technique id to a list that stores the techniques for these groups
-                techniques_from_group.append(technique['external_references'][0]['external_id'])
-            # check if the techniques that were placed as input from an incident are a sublist from the techniques used by this group
-            if (all(x in techniques_from_group for x in techniques_from_incident)):
+    def identify_groups(self, techniques_from_incident, software_from_incident):
+        campaigns_sheet = pd.read_excel("campaigns.xlsx", sheet_name="campaigns")
+        campaigns_software_sheet = pd.read_excel("campaigns.xlsx", sheet_name="associated software")
+        campaigns_technique_sheet = pd.read_excel("campaigns.xlsx", sheet_name="techniques used")
+        campaigns_groups_sheet = pd.read_excel("campaigns.xlsx", sheet_name="attributed groups")
+        counter=0
+        groups_sheet = pd.read_excel("groups.xlsx", sheet_name="groups")
+        # Get the column names
+        for index, row in groups_sheet.iterrows():
+            match = False
+            group = row[list(row.keys())[0]]
+            group_name = row[list(row.keys())[1]]
+            group_desc = row[list(row.keys())[2]]
+            group_url = row[list(row.keys())[3]]
+            group_associated_groups = row[list(row.keys())[8]]
+
+            techniques_used_sheet = pd.read_excel("groups.xlsx", sheet_name="techniques used")
+            if software_from_incident:
+                associated_software_sheet = pd.read_excel("groups.xlsx", sheet_name="associated software")
+
+            techniques_used_sheet = pd.read_excel("groups.xlsx", sheet_name="techniques used")
+            # Loop through the values list
+            group_techniques = []
+            group_software = []
+            # Loop through each row in the first column of the Excel file
+            for index2, row2 in techniques_used_sheet.iterrows():
+                if row2.iloc[0] == group:
+                    group_techniques.append(row2.iloc[4])
+
+            if software_from_incident:
+                for index3, row3 in associated_software_sheet.iterrows():
+                    if row3.iloc[0] == group:
+                        group_software.append(row3.iloc[4])
+
+            if (all(x in group_techniques for x in techniques_from_incident)):
                 # if yes, tha flag changes to True
                 match = True
-                count = count + 1
+                # print("!!!!!!Matched group: " + str(group))
+
             # if the user also gave software as an input
             if software_from_incident:
                 # change again the flag to False, since the software should also match
                 match = False
-                count = count - 1
-                # get the software used by this group through the att&ck client
-                group_software=lift.get_software_used_by_group(groups[counter])
-                # for every software (tool) in the software used by this group
-                for tool in group_software:
-                   # store the software id
-                   tools_from_group.append(tool['external_references'][0]['external_id'])
                 # check if the software that were placed as input from an incident are a sublist from the software used by this group
-                if(all(x in tools_from_group for x in software_from_incident)):
+                if (all(x in group_software for x in software_from_incident)):
                     # if yes, tha flag changes to True
                     match = True
-                    count = count + 1
+
             # if this group is a possible group that attacked in this incident
             if match == True:
-               # print the results. Also give this function the group name,id,url
-               self.print_results(group_name,group_id,group_url)
-            # at the end of the loop, re-initialize the flag, empty lists and increase the loop counter
-            techniques_from_group.clear()
-            tools_from_group.clear()
+                counter+=1
+                # print the results. Also give this function the group name,id,url
+                self.print_group_results(group_name,group,group_url)
+                # CAMPAIGNS CHECK
+                self.identify_campaigns(group,techniques_from_incident, software_from_incident, campaigns_sheet,
+                                        campaigns_groups_sheet, campaigns_technique_sheet, campaigns_software_sheet)
+
+        if counter==0:
+            print(colored("[-]", 'red') + " No groups found with that criteria")
+
+
+    def identify_campaigns(self, group, techniques, software, campaigns, campaigns_groups, campaigns_techniques, campaigns_software):
+
+        campaigns_list=[]
+        for index, row in campaigns_groups.iterrows():
+            if row[4] == group:
+                campaigns_list.append(row[0])
+
+        for campaign in campaigns_list:
+            for index, row in campaigns.iterrows():
+                if row[0] == campaign:
+                    campaign_name=row[1]
+                    campaign_url=row[3]
             match = False
-            counter = counter + 1
-        return count
+            campaigns_techniques_list = []
+            for index2, row2 in campaigns_techniques.iterrows():
+                if row2[0] == campaign:
+                    campaigns_techniques_list.append(row2[4])
+
+            if (all(x in campaigns_techniques_list for x in techniques)):
+                # if yes, tha flag changes to True
+                match = True
+
+            if software:
+                match=False
+                campaigns_software_list = []
+                for index3, row3 in campaigns_software.iterrows():
+                    if row3[0] == campaign:
+                        campaigns_software_list.append(row3[4])
+
+                if (all(x in campaigns_software_list for x in software)):
+                    # if yes, tha flag changes to True
+                    match = True
+            if match==True:
+                self.print_campaign_results(group, campaign_name, campaign, campaign_url)
+
+    def print_campaign_results(self, group, name, id, url):
+        # print group infromation about ATT&CK
+        print(colored("*****Possible Campaign Found from Group: " +str(group)+ "*****", 'green'))
+        print(tabulate([[name, id, url,
+                         'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fcampaigns%2F' + id + '%2F' + id + '-'+self.matrix+'-layer.json']],
+                       headers=['Name', 'ID', 'ATT&CK URL', 'ATT&CK Navigator URL']))
+        print("\n")
+        # save results to the file given with the -o flag, if present
+        if self.outfile is not None:
+            self.save_campaign_results(group, name, id, url)
+
 
 
     # results printing
-    def print_results(self, name, id, url):
+    def print_group_results(self, name, id, url):
         # print group infromation about ATT&CK
         print(colored("*****Possible Group Found*****", 'green'))
-        print(tabulate([[name, id, url, 'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F'+id+'%2F'+id+'-enterprise-layer.json']],
+        print(tabulate([[name, id, url, 'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F'+id+'%2F'+id+ '-'+self.matrix+'-layer.json']],
                     headers=['Name', 'ID', 'ATT&CK URL', 'ATT&CK Navigator URL']))
         print("\n")
         # show additional info if the -s flag is present
@@ -217,6 +309,19 @@ class Magic:
                      headers=['Source', 'Url']))
         print("...\n")
 
+
+    def save_campaign_results(self, group, name, id, url):
+        path = self.outfile
+        f = open(path, "a")
+        f.write("\n")
+        f.write("*****Possible Campaign Found from Group: " +str(group)+ "*****")
+        f.write("\n")
+        f.write("\n")
+        f.write(tabulate([[name, id, url,
+                        'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fcampaigns%2F' + id + '%2F' + id + '-'+self.matrix+'-layer.json']],
+                      headers=['Name', 'ID', 'ATT&CK URL', 'ATT&CK Navigator URL']))
+        f.write("\n")
+        f.write("\n")
 
     # save results to the file given with the -o flag, if present
     def save_results(self, name, id, url):

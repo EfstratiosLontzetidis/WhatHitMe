@@ -47,6 +47,15 @@ class Arguments:
 
         self.searches = args.searches
         self.outfile = args.outfile
+        if args.matrix:
+            self.matrix=args.matrix
+        else:
+            self.matrix = "0"
+
+        if args.matrix:
+            self.version = args.version
+        else:
+            self.version = "13.1"
 
 
     def update(self):
@@ -71,6 +80,10 @@ class Arguments:
     def ConfigureParser(self):
         parser = argparse.ArgumentParser(prog='whathitme.py', description="""""", epilog= '''Developers: Efstratios Lontzetidis (https://github.com/EfstratiosLontzetidis)
             Konstantinos Pantazis (https://github.com/kostas-pa)''', formatter_class=RawDescriptionHelpFormatter)
+        parser.add_argument('-m', '--matrix', default="0",nargs='*', dest="matrix", metavar='Matrix',
+                            help='Input the preferred matrix. (default) 0 for Enterprise, 1 for Mobile, 2 for ICS')
+        parser.add_argument('-v', '--version', default="13.1", nargs='*', dest="version", metavar='version',
+                            help='Input the preferred version. !!Always use the latest as no download occurs from previous versions: (default) 13.1')
         parser.add_argument('-t', '--technique', nargs='*', dest="input_technique", metavar='Technique', help='Input the technique. If there are multiple include them like so "-t T1XXX T1XXX"')
         parser.add_argument('-s', '--software', nargs='*', dest="input_software", metavar='Software', help='Input the software. If there are multiple include them like so "-s S0XXX S0XXX"')
         parser.add_argument('-ft', '--filetech', dest="file_technique", metavar='File techniques', help='Input a file containing the techniques. Supported file formats: txt', type=argparse.FileType('r'))
