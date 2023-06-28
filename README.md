@@ -75,7 +75,7 @@ Konstantinos Pantazis   (https://github.com/kostas-pa)
 
 # ⚠️ Common Issues
 
-• WhatHitMe presents an attributed Group or Campaign if every input given for techniques and software is included in that Group or Campaign. Its accuracy depends on the accuracy of your technique and software capability. In later versions likelihood will be included for each result.
+• WhatHitMe presents an attributed Group or Campaign if every input given for techniques and software is included in that Group or Campaign. Its accuracy depends on the accuracy of your technique and software extraction capability. In later versions likelihood will be included for each result.
 
 # Sidenote
 
