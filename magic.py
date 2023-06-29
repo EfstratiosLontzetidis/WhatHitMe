@@ -305,6 +305,8 @@ class Magic:
         # print searched related with this group
         print(colored("[!]", 'yellow') + " Searches regarding this group:")
         print(tabulate([['OpenCTI (req. login)', 'https://demo.opencti.io/dashboard/search/'+urllib.parse.quote(name)],
+                        ['VirusTotal',
+                         'https://www.virustotal.com/gui/search/' + urllib.parse.quote(name)+'/comments'],
                         ['Alienvault OTX (req. login)', 'https://otx.alienvault.com/browse/global/pulses?q='+urllib.parse.quote(name)+'&include_inactive=0&sort=-modified&page=1&limit=10&indicatorsSearch='+urllib.parse.quote(name)],
                      ['Mandiant', 'https://www.mandiant.com/search?search='+urllib.parse.quote(name)],
                      ['IBM X-FORCE (req. login)', 'https://exchange.xforce.ibmcloud.com/search/'+urllib.parse.quote(name)],
