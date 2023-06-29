@@ -201,9 +201,11 @@ class Magic:
                 for index3, row3 in associated_software_sheet.iterrows():
                     if row3.iloc[0] == group:
                         group_software.append(row3.iloc[4])
-
+            confidence = 0
             if (all(x in group_techniques for x in techniques_from_incident)):
                 # if yes, tha flag changes to True
+                confidence = (len(techniques_from_incident) / len(group_techniques)) * 100
+                confidence_final = round(confidence,2)
                 match = True
                 # print("!!!!!!Matched group: " + str(group))
 
@@ -214,13 +216,15 @@ class Magic:
                 # check if the software that were placed as input from an incident are a sublist from the software used by this group
                 if (all(x in group_software for x in software_from_incident)):
                     # if yes, tha flag changes to True
+                    confidence2 = (len(software_from_incident) / len(group_software)) * 100
+                    confidence_final=round((confidence + confidence2)/2,2)
                     match = True
 
             # if this group is a possible group that attacked in this incident
             if match == True:
                 counter+=1
                 # print the results. Also give this function the group name,id,url
-                self.print_group_results(group_name,group,group_url)
+                self.print_group_results(group_name,group,group_url, confidence_final)
                 # CAMPAIGNS CHECK
                 self.identify_campaigns(group,techniques_from_incident, software_from_incident, campaigns_sheet,
                                         campaigns_groups_sheet, campaigns_technique_sheet, campaigns_software_sheet)
@@ -246,9 +250,11 @@ class Magic:
             for index2, row2 in campaigns_techniques.iterrows():
                 if row2[0] == campaign:
                     campaigns_techniques_list.append(row2[4])
-
+            confidence = 0
             if (all(x in campaigns_techniques_list for x in techniques)):
                 # if yes, tha flag changes to True
+                confidence = (len(techniques)/len(campaigns_techniques_list))*100
+                confidence_final = round(confidence,2)
                 match = True
 
             if software:
@@ -260,27 +266,29 @@ class Magic:
 
                 if (all(x in campaigns_software_list for x in software)):
                     # if yes, tha flag changes to True
+                    confidence2=(len(software)/len(campaigns_software_list))*100
+                    confidence_final=round((confidence + confidence2)/2,2)
                     match = True
             if match==True:
-                self.print_campaign_results(group, campaign_name, campaign, campaign_url)
+                self.print_campaign_results(group, campaign_name, campaign, campaign_url, confidence_final)
 
-    def print_campaign_results(self, group, name, id, url):
+    def print_campaign_results(self, group, name, id, url, confidence):
         # print group infromation about ATT&CK
-        print(colored("*****Possible Campaign Found from Group: " +str(group)+ "*****", 'green'))
+        print(colored("*****Possible Campaign: "+str(name)+" found from Group: " +str(group)+ " with confidence: "+str(confidence)+"%*****", 'green'))
         print(tabulate([[name, id, url,
                          'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fcampaigns%2F' + id + '%2F' + id + '-'+self.matrix+'-layer.json']],
                        headers=['Name', 'ID', 'ATT&CK URL', 'ATT&CK Navigator URL']))
         print("\n")
         # save results to the file given with the -o flag, if present
         if self.outfile is not None:
-            self.save_campaign_results(group, name, id, url)
+            self.save_campaign_results(group, name, id, url, confidence)
 
 
 
     # results printing
-    def print_group_results(self, name, id, url):
+    def print_group_results(self, name, id, url, confidence):
         # print group infromation about ATT&CK
-        print(colored("*****Possible Group Found*****", 'green'))
+        print(colored("*****Possible Group "+str(name)+ " found with confidence: "+str(confidence)+"%*****", 'green'))
         print(tabulate([[name, id, url, 'https://mitre-attack.github.io/attack-navigator//#layerURL=https%3A%2F%2Fattack.mitre.org%2Fgroups%2F'+id+'%2F'+id+ '-'+self.matrix+'-layer.json']],
                     headers=['Name', 'ID', 'ATT&CK URL', 'ATT&CK Navigator URL']))
         print("\n")
@@ -289,7 +297,7 @@ class Magic:
            self.searchess(name, id, url)
         # save results to the file given with the -o flag, if present
         if self.outfile is not None:
-            self.save_results(name, id, url)
+            self.save_results(name, id, url, confidence)
 
 
     # show additional info if the -s flag is present
@@ -310,11 +318,11 @@ class Magic:
         print("...\n")
 
 
-    def save_campaign_results(self, group, name, id, url):
+    def save_campaign_results(self, group, name, id, url, confidence):
         path = self.outfile
         f = open(path, "a")
         f.write("\n")
-        f.write("*****Possible Campaign Found from Group: " +str(group)+ "*****")
+        f.write("*****Possible Campaign: "+str(name)+" found from Group: " +str(group)+ " with confidence: "+str(confidence)+"%*****")
         f.write("\n")
         f.write("\n")
         f.write(tabulate([[name, id, url,
@@ -324,11 +332,11 @@ class Magic:
         f.write("\n")
 
     # save results to the file given with the -o flag, if present
-    def save_results(self, name, id, url):
+    def save_results(self, name, id, url, confidence):
         path = self.outfile
         f = open(path, "a")
         f.write("\n")
-        f.write("*****Possible Group Found*****")
+        f.write("*****Possible Group "+str(name)+ " found with confidence: "+str(confidence)+"%*****")
         f.write("\n")
         f.write("\n")
         f.write(tabulate([[name, id, url,
